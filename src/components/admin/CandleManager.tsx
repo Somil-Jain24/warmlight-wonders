@@ -1,40 +1,27 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { PlusCircle, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import CandleForm from "./CandleForm";
 import { Candle } from '@/types/candle';
 import { CandleFormData } from '@/types/admin';
-import { candles as initialCandles } from '@/data/candles';
+import { useCandleContext } from '@/context/CandleContext';
 
 interface CandleManagerProps {
   darkMode: boolean;
 }
 
 const CandleManager: React.FC<CandleManagerProps> = ({ darkMode }) => {
-  const [candles, setCandles] = useState<Candle[]>([]);
+  const { candles, setCandles } = useCandleContext();
   const [editingCandle, setEditingCandle] = useState<CandleFormData | null>(null);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const { toast } = useToast();
-
-  // Load candles - in a real app, this would be an API call
-  useEffect(() => {
-    // Simulating data load
-    setCandles(initialCandles.map(candle => ({
-      ...candle,
-      // Adding mock fields that would come from a real DB
-      isLive: true,
-      isComingSoon: false,
-      price: Math.floor(Math.random() * 1000) + 500 // Random price in INR
-    })));
-  }, []);
 
   const handleAddCandle = (candleData: CandleFormData) => {
     const newCandle = {

@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import CandleCard from './CandleCard';
 import CandleModal from './CandleModal';
-import { candles } from '../data/candles';
+import { useCandleContext } from '../context/CandleContext';
 import { Candle } from '../types/candle';
 
 const ProductsSection: React.FC = () => {
+  const { candles } = useCandleContext();
   const [selectedCandle, setSelectedCandle] = useState<Candle | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -18,6 +19,11 @@ const ProductsSection: React.FC = () => {
     setIsModalOpen(false);
   };
 
+  // Filter candles to only show live ones that aren't marked as coming soon
+  const liveCandles = candles.filter(candle => 
+    (candle as any).isLive === true && !(candle as any).isComingSoon
+  );
+
   return (
     <section id="products" className="section-padding bg-white">
       <div className="container mx-auto">
@@ -27,21 +33,27 @@ const ProductsSection: React.FC = () => {
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {candles.map((candle) => (
-            <div 
-              key={candle.id} 
-              className="opacity-0 animate-fade-in" 
-              style={{ animationDelay: `${parseInt(candle.id) * 0.15}s` }}
-            >
-              <CandleCard
-                id={candle.id}
-                name={candle.name}
-                image={candle.image}
-                description={candle.description}
-                onClick={() => openModal(candle)}
-              />
+          {liveCandles.length > 0 ? (
+            liveCandles.map((candle) => (
+              <div 
+                key={candle.id} 
+                className="opacity-0 animate-fade-in" 
+                style={{ animationDelay: `${parseInt(candle.id) * 0.15}s` }}
+              >
+                <CandleCard
+                  id={candle.id}
+                  name={candle.name}
+                  image={candle.image}
+                  description={candle.description}
+                  onClick={() => openModal(candle)}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="col-span-3 text-center py-12 text-gray-500">
+              No candles available at the moment. Check back soon!
             </div>
-          ))}
+          )}
         </div>
         
         <CandleModal
